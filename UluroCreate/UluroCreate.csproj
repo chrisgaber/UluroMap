@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="uluroclasses.cs" />
     <Compile Include="ulurocreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

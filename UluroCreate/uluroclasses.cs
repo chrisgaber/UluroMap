@@ -13,20 +13,25 @@ public class uluroGroup
      */
     private string groupName
     {
-        get;
+        get
+        {
+            return groupName;
+        }
         set
         {
-            if (value.Substring(1, 1) != '\"')
+            if (value.Substring(1, 1) != "\"")
             {
-                value = '\"' + value;
-            }
-            if (value.Substring(value.Length - 1) != '\"')
+                groupName = '\"' + value;
+            } 
+            if (value.Substring(value.Length - 1) != "\"")
             {
-                value = value + '\"';
+                groupName = value + '\"';
             }
+
+            groupName = value;
         }
     }
-    public bool openState { get; }
+    public bool openState { get; set; }
     public StreamWriter outFile { get; set; }
 
     public uluroGroup (string name, StreamWriter outPut)
@@ -36,31 +41,29 @@ public class uluroGroup
         openState = true;
     }
 
-    private string writeOpen()
+    public void writeOpen()
     {
 
         //flip the state and header to be written.
         if (openState)
         {
             openState = false;
-            headerName = "C019";
         }
         else
         {
             Console.WriteLine("Another instance of uluroGroup " + this.groupName + " was opened before the previous was closed.");
         }
 
-        outFile.WriteLine("C020" + '\t' + this.groupName);
+        outFile.WriteLine("C019" + '\t' + this.groupName);
     }
 
-    private string writeClose()
+    public void writeClose()
     {
 
         //flip the state and header to be written.
         if (!openState)
         {
             openState = true;
-            headerName = "C020";
         }
         else
         {
@@ -72,69 +75,85 @@ public class uluroGroup
 }
 
 
-abstract class uluroVariable
+public abstract class uluroVariable
 {
-    private string varType
+    public string varType
     {
-        get;
+        get
+        {
+            return varType;
+        }
         set
         {
             {
-                if (value.Substring(1, 1) != '\"')
+                if (value.Substring(1, 1) != "\"")
                 {
-                    value = '\"' + value;
+                    varType = '\"' + value;
                 }
-                if (value.Substring(value.Length - 1) != '\"')
+                if (value.Substring(value.Length - 1) != "\"")
                 {
-                    value = value + '\"';
+                    varType = value + '\"';
                 }
+                varType = value;
             }
         }
     }
-    private string varName
+    public string varName
     {
-        get;
+        get
+        {
+            return varName;
+        }
         set
         {
-            if (value.Substring(1, 1) != '\"')
             {
-                value = '\"' + value;
-            }
-            if (value.Substring(value.Length - 1) != '\"')
-            {
-                value = value + '\"';
+                if (value.Substring(1, 1) != "\"")
+                {
+                    varName = '\"' + value;
+                }
+                if (value.Substring(value.Length - 1) != "\"")
+                {
+                    varName = value + '\"';
+                }
+                varName = value;
             }
         }
     }
 
     public StreamWriter outFile { get; set; }
 
-    public void createReadPosition(int xpos, int length, int ypos = 0, string delimiter = "", string funcName ="", string param)
+    public void createReadPosition(int xpos, int length, int ypos = 0, string delimiter = "", string funcName ="", string param = "")
     {
         //C008	2	"_TEST VAR"	"M"	"P"
         string outStr = "C008" + "	1	" + varName + "	" + varType + "	'P'	";
         //
-        switch (funcName.ToUpper)
+        switch (funcName.ToUpper())
         {
 
             case "TRIM":
                 outStr = outStr + "'T'\tC0";
+                break;
             case "MULT":
             case "MULTIPLY":
                 outStr = outStr + "'*'\tC1\tX\t" + param;
+                break;
             case "DIV":
             case "DIVISION":
                 outStr = outStr + "'/'\tC1\tX\t" + param;
+                break;
             case "ADD":
                 outStr = outStr + "'+'\tC1\tX\t" + param;
+                break;
             case "MOD":
                 outStr = outStr + "'!'\tC1\tX\t" + param;
+                break;
             default:
                 outStr = outStr + "'|'\tC0";
+                break;
         }
         //Not sure what this is yet.
         outStr = outStr + "	N	'F'		0		N	0	0	0	0		1N	0	Y	Y";
-        outFile.WriteLine(outStr.Replace("\'", '\"'));
+        outFile.WriteLine(outStr.Replace('\'', '\"'));
     }
       
 }
@@ -143,16 +162,16 @@ public class uDate:uluroVariable
 {
     public uDate(string varName, StreamWriter sendTo)
     {
-        this.varType = "\"D\"";
+        this.varType = "D";
         this.varName = varName;
         this.outFile = sendTo;
     }
 }
 public class uCurrency : uluroVariable
 {
-    public uCurrency()
+    public uCurrency(string varName, StreamWriter sendTo)
     {
-        this.varType = "\"M\"";
+        this.varType = "M";
         this.varName = varName;
         this.outFile = sendTo;
     }
@@ -161,7 +180,7 @@ public class uReal : uluroVariable
 {
     public uReal(string varName, StreamWriter sendTo)
     {
-        this.varType = "\"R\"";
+        this.varType = "R";
         this.varName = varName;
         this.outFile = sendTo;
     }
@@ -170,7 +189,7 @@ public class uInt : uluroVariable
 {
     public uInt(string varName, StreamWriter sendTo)
     {
-        this.varType = "\"I\"";
+        this.varType = "I";
         this.varName = varName;
         this.outFile = sendTo;
     }
@@ -179,7 +198,7 @@ public class uText : uluroVariable
 {
     public uText(string varName, StreamWriter sendTo)
     {
-        this.varType = "\"T";
+        this.varType = "T";
         this.varName = varName;
         this.outFile = sendTo;
     }
