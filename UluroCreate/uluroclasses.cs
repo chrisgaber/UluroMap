@@ -19,16 +19,17 @@ public class uluroGroup
         }
         set
         {
-            if (value.Substring(1, 1) != "\"")
+            if (value.Substring(0, 1) != "\"")
             {
-                groupName = '\"' + value;
-            } 
+                value = '\"' + value;
+            }
             if (value.Substring(value.Length - 1) != "\"")
             {
-                groupName = value + '\"';
+                value = value + '\"';
             }
 
-            groupName = value;
+            this.groupName = value;
+
         }
     }
     public bool openState { get; set; }
@@ -85,17 +86,19 @@ public abstract class uluroVariable
         }
         set
         {
+            
+            if (value.Substring(0, 1) != "\"")
             {
-                if (value.Substring(1, 1) != "\"")
-                {
-                    varType = '\"' + value;
-                }
-                if (value.Substring(value.Length - 1) != "\"")
-                {
-                    varType = value + '\"';
-                }
-                varType = value;
+                value = '\"' + value;
             }
+            if (value.Substring(value.Length - 1) != "\"")
+            {
+                value = value + '\"';
+            }
+               
+            this.varType = value;
+                
+            
         }
     }
     public string varName
@@ -106,17 +109,16 @@ public abstract class uluroVariable
         }
         set
         {
+            if (value.Substring(0, 1) != "\"")
             {
-                if (value.Substring(1, 1) != "\"")
-                {
-                    varName = '\"' + value;
-                }
-                if (value.Substring(value.Length - 1) != "\"")
-                {
-                    varName = value + '\"';
-                }
-                varName = value;
+                value = '\"' + value;
             }
+            if (value.Substring(value.Length - 1) != "\"")
+            {
+                value = value + '\"';
+            }
+
+            this.varName = value;
         }
     }
 
