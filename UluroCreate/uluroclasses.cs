@@ -19,17 +19,16 @@ public class uluroGroup
         }
         set
         {
-            string test = value;
-            if (test.Substring(0, 1) != "\"")
+            if (value.Substring(0, 1) != "\"")
             {
-                test = '\"' + test;
+                value = '\"' + value;
             }
-            if (test.Substring(test.Length - 1) != "\"")
+            if (value.Substring(value.Length - 1) != "\"")
             {
-                test = test + '\"';
+                value = value + '\"';
             }
 
-            this.groupName = test;
+            this.groupName = value;
 
         }
     }
@@ -87,17 +86,17 @@ public abstract class uluroVariable
         }
         set
         {
-            string test = value;
-            if (test.Substring(0, 1) != "\"")
+            
+            if (value.Substring(0, 1) != "\"")
             {
-                test = '\"' + test;
+                value = '\"' + value;
             }
-            if (test.Substring(test.Length - 1) != "\"")
+            if (value.Substring(value.Length - 1) != "\"")
             {
-                test = test + '\"';
+                value = value + '\"';
             }
                
-            this.varType = test;
+            this.varType = value;
                 
             
         }
@@ -110,17 +109,16 @@ public abstract class uluroVariable
         }
         set
         {
-            string test = value;
-            if (test.Substring(0, 1) != "\"")
+            if (value.Substring(0, 1) != "\"")
             {
-                test = '\"' + test;
+                value = '\"' + value;
             }
-            if (test.Substring(test.Length - 1) != "\"")
+            if (value.Substring(value.Length - 1) != "\"")
             {
-                test = test + '\"';
+                value = value + '\"';
             }
 
-            this.varName = test;
+            this.varName = value;
         }
     }
 
