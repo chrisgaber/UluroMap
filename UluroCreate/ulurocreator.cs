@@ -19,6 +19,8 @@ namespace UluroCreate
                 tranLines[i] = new uText("Test 1" + i.ToString(), outTemp);
                 tranLines[i].createReadPosition(1 + i * 30, 15);
             }
+
+            outTemp.Close();
         }
     }
 

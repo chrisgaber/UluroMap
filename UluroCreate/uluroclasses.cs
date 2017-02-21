@@ -126,35 +126,35 @@ public abstract class uluroVariable
     public void createReadPosition(int xpos, int length, int ypos = 0, string delimiter = "", string funcName = "", string param = "")
     {
         //C008	2	"_TEST VAR"	"M"	"P"
-        string outStr = "C008" + "	1	" + varName + "	" + varType + "	'P'	";
+        string outStr = "C008" + "	\"1\"	\"" + varName + "\"	\"" + varType + "\"	\"P\"	";
         //
         switch (funcName.ToUpper())
         {
 
             case "TRIM":
-                outStr = outStr + "'T'\tC0";
+                outStr = outStr + "\"T\"\tC0";
                 break;
             case "MULT":
             case "MULTIPLY":
-                outStr = outStr + "'*'\tC1\tX\t" + param;
+                outStr = outStr + "\"*\"\tC1\tX\t" + param;
                 break;
             case "DIV":
             case "DIVISION":
-                outStr = outStr + "'/'\tC1\tX\t" + param;
+                outStr = outStr + "\"/\"\tC1\tX\t" + param;
                 break;
             case "ADD":
-                outStr = outStr + "'+'\tC1\tX\t" + param;
+                outStr = outStr + "\"+\"\tC1\tX\t" + param;
                 break;
             case "MOD":
-                outStr = outStr + "'!'\tC1\tX\t" + param;
+                outStr = outStr + "\"!\"\tC1\tX\t" + param;
                 break;
             default:
-                outStr = outStr + "'|'\tC0";
+                outStr = outStr + "\"|\"\tC0";
                 break;
         }
         //Not sure what this is yet.
-        outStr = outStr + "	N	'F'		0		N	0	0	0	0		1N	0	Y	Y";
-        outFile.WriteLine(outStr.Replace('\'', '\"'));
+        outStr = outStr + "	N	\"F\"		0		N	0	0	0	0		1N	0	Y	Y";
+        outFile.WriteLine(outStr);
     }
 
 }
