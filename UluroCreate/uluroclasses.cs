@@ -7,35 +7,35 @@ public class uluroGroup
     /*
     Open Group
     C020	"headerName"	N	N	N
-
     Close Group
     C020	"headerName"	N	N	N
      */
-    private string groupName
-    {
-        get
-        {
-            return groupName;
-        }
-        set
-        {
-            if (value.Substring(0, 1) != "\"")
-            {
-                value = '\"' + value;
-            }
-            if (value.Substring(value.Length - 1) != "\"")
-            {
-                value = value + '\"';
-            }
+    private string groupName;
+    //{
+    //    get
+    //    {
+    //        return groupName;
+    //    }
+    //    set
+    //    {
+    //        string test = value;
+    //        if (test.Substring(0, 1) != "\"")
+    //        {
+    //            test = '\"' + test;
+    //        }
+    //        if (test.Substring(test.Length - 1) != "\"")
+    //        {
+    //            test = test + '\"';
+    //        }
 
-            this.groupName = value;
+    //        this.groupName = test;
 
-        }
-    }
+    //    }
+    //}
     public bool openState { get; set; }
     public StreamWriter outFile { get; set; }
 
-    public uluroGroup (string name, StreamWriter outPut)
+    public uluroGroup(string name, StreamWriter outPut)
     {
         groupName = name;
         outFile = outPut;
@@ -78,53 +78,52 @@ public class uluroGroup
 
 public abstract class uluroVariable
 {
-    public string varType
-    {
-        get
-        {
-            return varType;
-        }
-        set
-        {
-            
-            if (value.Substring(0, 1) != "\"")
-            {
-                value = '\"' + value;
-            }
-            if (value.Substring(value.Length - 1) != "\"")
-            {
-                value = value + '\"';
-            }
-               
-            this.varType = value;
-                
-            
-        }
-    }
-    public string varName
-    {
-        get
-        {
-            return varName;
-        }
-        set
-        {
-            if (value.Substring(0, 1) != "\"")
-            {
-                value = '\"' + value;
-            }
-            if (value.Substring(value.Length - 1) != "\"")
-            {
-                value = value + '\"';
-            }
+    public string varType;
+    //{
+    //    get
+    //    {
+    //        return varType;
+    //    }
+    //    set
+    //    { 
+    //        string test = value;
+    //        if (test.Substring(0, 1) != "\"")
+    //        {
+    //            test = '\"' + test;
+    //        }
+    //        if (test.Substring(test.Length - 1) != "\"")
+    //        {
+    //            test = test + '\"';
+    //        }
 
-            this.varName = value;
-        }
-    }
+    //        this.varType = test;
+    //    }
+    //}
+    public string varName;
+    //{
+    //    get
+    //    {
+    //        return varName;
+    //    }
+    //    set
+    //    {
+    //        string test = value;
+    //        if (test.Substring(0, 1) != "\"")
+    //        {
+    //            test = '\"' + test;
+    //        }
+    //        if (test.Substring(test.Length - 1) != "\"")
+    //        {
+    //            test = test + '\"';
+    //        }
+
+    //        this.varName = test;
+    //    }
+    //}
 
     public StreamWriter outFile { get; set; }
 
-    public void createReadPosition(int xpos, int length, int ypos = 0, string delimiter = "", string funcName ="", string param = "")
+    public void createReadPosition(int xpos, int length, int ypos = 0, string delimiter = "", string funcName = "", string param = "")
     {
         //C008	2	"_TEST VAR"	"M"	"P"
         string outStr = "C008" + "	1	" + varName + "	" + varType + "	'P'	";
@@ -157,10 +156,10 @@ public abstract class uluroVariable
         outStr = outStr + "	N	'F'		0		N	0	0	0	0		1N	0	Y	Y";
         outFile.WriteLine(outStr.Replace('\'', '\"'));
     }
-      
+
 }
 
-public class uDate:uluroVariable
+public class uDate : uluroVariable
 {
     public uDate(string varName, StreamWriter sendTo)
     {

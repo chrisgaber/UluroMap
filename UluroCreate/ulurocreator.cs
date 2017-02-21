@@ -11,6 +11,7 @@ namespace UluroCreate
     {
         static void Main(string[] args)
         {
+
             StreamWriter outTemp = new StreamWriter(@"c:\temp\testout.txt");
             uText[] tranLines = new uText[6];
             for(int i=0; i < 5; i++)
