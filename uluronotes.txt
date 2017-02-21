@@ -1,0 +1,51 @@
+Variables
+
+C008	- header
+Int		- variable id?  If you use copy, it will duplicate this as well. If altered, it does not affect retyping affected maps. May be nothing or legacy. 
+string	- variable readable name
+"T"/"M"/"I"/"R"/"D"	- Text/currency/integer/real/date
+{ Map type
+"P"		- for position
+	int		- x position
+	int		- y position
+	int		- length
+	(null)/string	- delimiter
+"F"		- for fixed
+	string - value, note: not quotes for text vs num
+}
+string	- delimiter
+{SubFuntion  //Seems C0 means no parameters, C1 means parameters
+"T"	C0	- trim, no parameters
+"|"	C0	- defualt, nothing.
+"*"	C1	X	3.00   - Multiply 3 (currency)
+"+"	C1	X	3      - Add 3 (int)
+"/"	C1	X	3.00   - Div 3 (currency)
+"!"	C1	X	3      - Mod 3 (int only)
+}
+etc:
+N	"F"		0		N	0	0	0	0		1N	0	Y	Y
+
+
+Variable Mapping
+C009	- header
+1/0      - ???.  Seems to have no affect.  Set to 0.
+0.9792  - X coordinate
+2.9583  - y coordinate
+string  - Name of variable mapped
+2       - corisponds to the variable id???	Gets copied if coppied is used, if altered, the type will update if the variable updates.  probably legacy.
+Y		(L/R/C/D)	Y	Y	N	N	N	0             - pick (L/R/C/D) for left/right/center/decimal.  ??? for the rest.  Type, center, and coordinate type seems to have no affect.
+{You can use this to add in a real number as a coordinate instead of a static coordinate.  
+V/F	RealXName	RealYName    - must be real number.  F or V for variable or field
+)The number in the static spot are ignored.  Sub for (null) if unused.
+						Y
+Open Group
+C019	Tag
+"EXCLUDE EMPTY ACCT"	Name
+etc:
+N	N	N
+
+Close Group
+C020	Tag
+"EXCLUDE EMPTY ACCT"	Name
+etc:
+N	N	N
