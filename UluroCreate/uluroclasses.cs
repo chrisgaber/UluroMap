@@ -75,6 +75,33 @@ public class uluroGroup
     }
 }
 
+public class uluroCond
+{
+    public uluroCond(StreamWriter outFile)
+    {
+        this.outFile = outFile;
+    }
+    public StreamWriter outFile { get; set; }
+
+    public void createCondition(uluroVariable param1, string test, string param2, bool NOT)
+    {
+        //C012	""	"E"	C2	F	ACCT_ID	X	\d{4,6}-\d{4,6}	N	Y/N	N
+        string outString = "C012	\"\"	";
+        switch (test.ToUpper())
+        {
+            case "REGEXP":
+            case "REGEX":
+                outString = outString + "\"E\"";
+                break;
+            default:
+                outString = outString + "\""+test+"\"";
+                break;
+        }
+        outString = outString + "";
+        outFile.WriteLine(outString);
+    }
+
+}
 
 public abstract class uluroVariable
 {
@@ -123,16 +150,42 @@ public abstract class uluroVariable
 
     public StreamWriter outFile { get; set; }
 
-    public void createReadPosition(int xpos, int length, int ypos = 0, string delimiter = "", string funcName = "", string param = "")
+    public  void createFixed(string param)
     {
+        string outStr = "C008" + "	1	\"" + varName + "\"	\"" + varType + "\"	\"P\"	";
+        outStr = outStr + "\"F\"" + '\t' + param + '\t';
+        outStr = outStr + "N	\"F\"		0		N	0	0	0	0		1N	0	Y	Y";
+        outFile.WriteLine(outStr);
+    }
+
+    public void createReadPosition(int xpos=1, int length=0, string funcName = "", string param = "", int ypos = 1, string delimiter = "")
+    {
+        //Var info: header,some int,"name","type","P" (for position)
         //C008	2	"_TEST VAR"	"M"	"P"
-        string outStr = "C008" + "	\"1\"	\"" + varName + "\"	\"" + varType + "\"	\"P\"	";
-        //
+        string outStr = "C008" + "	1	\"" + varName + "\"	\"" + varType + "\"	\"P\"	";
+
+        //Input Info:  X, Y, len, delimiter
+        //7392	1	30	""	
+        if (delimiter.Length > 0)
+        {
+            delimiter = "\"" + delimiter + "\"";
+        }
+        outStr = outStr + xpos.ToString() + '\t' + ypos.ToString() + '\t' + length.ToString() + '\t'+ delimiter + '\t';
+
+        //Function info: X, Y, len, delimiter
+
         switch (funcName.ToUpper())
         {
 
             case "TRIM":
-                outStr = outStr + "\"T\"\tC0";
+                if (param.Length == 0)
+                {
+                    outStr = outStr + "\"T\"\tC0\t" + param;
+                }
+                else
+                {
+                    outStr = outStr + "\"T\"\tC1\tX\t" + param;
+                }
                 break;
             case "MULT":
             case "MULTIPLY":
@@ -149,13 +202,15 @@ public abstract class uluroVariable
                 outStr = outStr + "\"!\"\tC1\tX\t" + param;
                 break;
             default:
-                outStr = outStr + "\"|\"\tC0";
+                outStr = outStr + "\""+ param+"\"\tC0\t";
                 break;
         }
         //Not sure what this is yet.
-        outStr = outStr + "	N	\"F\"		0		N	0	0	0	0		1N	0	Y	Y";
+        outStr = outStr + "N	\"F\"		0		N	0	0	0	0		1N	0	Y	Y";
         outFile.WriteLine(outStr);
     }
+
+
 
 }
 
