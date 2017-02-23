@@ -37,7 +37,7 @@ public class uluroGroup
 
     public uluroGroup(string name, StreamWriter outPut)
     {
-        groupName = name;
+        groupName = "\"" + name + "\"";
         outFile = outPut;
         openState = true;
     }
@@ -55,8 +55,9 @@ public class uluroGroup
             Console.WriteLine("Another instance of uluroGroup " + this.groupName + " was opened before the previous was closed.");
         }
 
-        outFile.WriteLine("C019" + '\t' + this.groupName);
-    }
+        outFile.WriteLine("C019" + '\t' + this.groupName + "	N	N	N");
+
+	}
 
     public void writeClose()
     {
@@ -71,8 +72,9 @@ public class uluroGroup
             Console.WriteLine("uluroGroup " + this.groupName + " was closed when it was already closed.");
         }
 
-        outFile.WriteLine("C020" + '\t' + this.groupName);
-    }
+        outFile.WriteLine("C020" + '\t' + this.groupName + "	N	N	N");
+
+	}
 }
 
 public class uluroCond
@@ -83,22 +85,65 @@ public class uluroCond
     }
     public StreamWriter outFile { get; set; }
 
-    public void createCondition(uluroVariable param1, string test, string param2, bool NOT)
+    private string getCondValue(string test)
     {
-        //C012	""	"E"	C2	F	ACCT_ID	X	\d{4,6}-\d{4,6}	N	Y/N	N
-        string outString = "C012	\"\"	";
+        string testCode = "";
         switch (test.ToUpper())
         {
             case "REGEXP":
             case "REGEX":
-                outString = outString + "\"E\"";
+                testCode = "\"E\"";
+                break;
+			case "NOT BLANK":
+				testCode = "\"X\"";
+				break;
+			case "BLANK":
+            case "EMPTY":
+                testCode = "\"0\"";
                 break;
             default:
-                outString = outString + "\""+test+"\"";
+                testCode = "\"" + test + "\"";
                 break;
         }
-        outString = outString + "";
+        return testCode;
+    }
+
+    private void writeCondition<T, V>(T param1, string test, V param2, bool NOT=false)
+    {
+        //C012	""	"E"	C2	F	ACCT_ID	X	\d{4,6}-\d{4,6}	N	Y/N	N
+        string outString = "C012	\"\"	" + getCondValue(test);
+
+        outString = outString + "\tC2\t" + (param1.GetType() == System.Type.GetType("String") ? "X\t" + param1:"V\t" + param1.ToString()) 
+            + "\t" 
+            + (param2.GetType() == System.Type.GetType("String") ? "X\t" + param2 : "V\t" + param2.ToString()) 
+            + "\tN\t" + (NOT ? "Y" : "N") + "\tN";
         outFile.WriteLine(outString);
+    }
+    
+    //Maybe an easier way to to do this.
+    public void createCondition(uluroVariable param1, string test, uluroVariable param2, bool NOT=false)
+    {
+        writeCondition<uluroVariable, uluroVariable>(param1, test, param2, NOT);
+    }
+    public void createCondition(string param1, string test, uluroVariable param2, bool NOT = false)
+    {
+        writeCondition<string, uluroVariable>(param1, test, param2, NOT);
+    }
+    public void createCondition(uluroVariable param1, string test, string param2, bool NOT = false)
+    {
+        writeCondition<uluroVariable, string>(param1, test, param2, NOT);
+    }
+    public void createCondition(string param1, string test, string param2, bool NOT = false)
+    {
+        writeCondition<string, string>(param1, test, param2, NOT);
+    }
+    public void createCondition(string param1, string test, bool NOT = false)
+    {
+        writeCondition<string, string>(param1, test, "", NOT);
+    }
+    public void createCondition(uluroVariable param1, string test, bool NOT = false)
+    {
+        writeCondition<uluroVariable, string>(param1, test, "", NOT);
     }
 
 }
@@ -127,34 +172,38 @@ public abstract class uluroVariable
     //    }
     //}
     public string varName;
-    //{
-    //    get
-    //    {
-    //        return varName;
-    //    }
-    //    set
-    //    {
-    //        string test = value;
-    //        if (test.Substring(0, 1) != "\"")
-    //        {
-    //            test = '\"' + test;
-    //        }
-    //        if (test.Substring(test.Length - 1) != "\"")
-    //        {
-    //            test = test + '\"';
-    //        }
+	//{
+	//    get
+	//    {
+	//        return varName;
+	//    }
+	//    set
+	//    {
+	//        string test = value;
+	//        if (test.Substring(0, 1) != "\"")
+	//        {
+	//            test = '\"' + test;
+	//        }
+	//        if (test.Substring(test.Length - 1) != "\"")
+	//        {
+	//            test = test + '\"';
+	//        }
 
-    //        this.varName = test;
-    //    }
-    //}
-
+	//        this.varName = test;
+	//    }
+	//}
+	public string mapFont;
     public StreamWriter outFile { get; set; }
+    public override string ToString()
+    {
+        return varName;
+    }
 
     public  void createFixed(string param)
     {
-        string outStr = "C008" + "	1	\"" + varName + "\"	\"" + varType + "\"	\"P\"	";
-        outStr = outStr + "\"F\"" + '\t' + param + '\t';
-        outStr = outStr + "N	\"F\"		0		N	0	0	0	0		1N	0	Y	Y";
+        string outStr = "C008" + "	1	\"" + varName + "\"	\"" + varType + "\"	";
+        outStr = outStr + "\"F\"" + '	' + param + '	';
+        outStr = outStr + "\"|\"   C0 N   \"F\"     0       N   0   0   0   0   N   0   Y Y";
         outFile.WriteLine(outStr);
     }
 
@@ -210,8 +259,38 @@ public abstract class uluroVariable
         outFile.WriteLine(outStr);
     }
 
+    //Fixed
+    public void createMap(float xpos, float ypos, string format = "")
+    {
+		//C009	0	3.0520	4.3960	"_TEST CURRENCY"	1		Y		L	Y	Y	N	N	N	0									Y
+		string outStr = "C009\t0\t";
+		outStr = outStr + xpos.ToString("F") + "\t" + ypos.ToString() + "\t\"" + varName + "\"";
+		//This part is static.  1 is tied to the var num of the variable, but doesn't seem to matter.
+		//special formatting goes at the first Y spot.
+		outStr = outStr + "	1	" + format + "	Y		L	Y	Y	N	N	N	0									Y";
+		
+		outFile.WriteLine(outStr);
+	}
+	
+	//dynamic
+	public void createMap(uReal xpos, uReal ypos, string format = "")
+	{
+		//C009	0	3.0520	4.3960	"_TEST CURRENCY"	1		Y		L	Y	Y	N	N	N	0	V	DESCR X	Y POSITION						Y
+		string outStr = "C009\t0\t0.0000\t0.0000\t\"" + varName + "\"";
+		//This part is static.  1 is tied to the var num of the variable, but doesn't seem to matter.
+		//special formatting goes at the first Y spot.
+		outStr = outStr + "	1	"+format+"	Y		L	Y	Y	N	N	N	0";
+		outStr = outStr + "	V	" + xpos.varName + "	" + ypos.varName;
+		//Not sure what this is.
+		outStr = outStr + "						Y";
+		outFile.WriteLine(outStr);
+	}
 
-
+	public void setFont()
+	{
+		//To be worked on in the future.
+	}
+   
 }
 
 public class uDate : uluroVariable

@@ -18,11 +18,11 @@ C005	"DUEDATE"	"F"	"N"	"T"	"|"	C0	"Sys_DueDate"	N	1	-1	N	""	""		N	N	N		N	0	0	0	0
 C005	"BALANCE"	"F"	"N"	"M"	"|"	C0	"Sys_Balance"	N	1	-1	N	""	""		Y	N	N		N	0	0	0	0		Y	(CR)?-?\d+(\.\d{1,2})?(CR)?$	N	N	N		0	Y	Y
 C020	"SYS_FIELDS"	N	N	Y
 C001	Created 1/10/2017 10:11:32 AM	N	0	N	N
+C012	""	"E"	C2	F	ACCT_ID	X	\d{4,6}-\d{4,6}	N	Y	N
+C019	"EXCLUDE EMPTY ACCT"	N	N	N
+C011	"SYS_DOCEXCLUDE"	"T"	":"	C1	X	X	N	N
+C020	"EXCLUDE EMPTY ACCT"	N	N	N
 C019	"MODEL"	N	N	N
-C008	1	"TEXT"	"T"	"F"	hey	"|"	C0	N	"F"		0		N	0	0	0	0	N	0	Y	Y
-C008	2	"REAL"	"R"	"F"	1	"|"	C0	N	"F"		0		N	0	0	0	0	N	0	Y	Y
-C008	3	"INT"	"I"	"F"	1	"|"	C0	N	"F"		0		N	0	0	0	0	N	0	Y	Y
-C008	4	"CURRENCY"	"M"	"F"	1	"|"	C0	N	"F"		0		N	0	0	0	0	N	0	Y	Y
 C020	"MODEL"	N	N	N
 C019	"CONROLLER"	N	N	N
 C020	"CONROLLER"	N	N	N
