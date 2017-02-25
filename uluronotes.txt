@@ -23,7 +23,7 @@ string	- delimiter
 "!"	C1	X	3      - Mod 3 (int only)
 }
 etc:
-N	"F"		0		N	0	0	0	0		1N	0	Y	Y
+N|"F"||0||N|0|0|0|0||1N|0|Y|Y
 
 
 Variable Mapping
@@ -43,7 +43,7 @@ C019	Tag
 "EXCLUDE EMPTY ACCT"	Name
 etc:
 N	N	N
-
+	
 Close Group
 C020	Tag
 "EXCLUDE EMPTY ACCT"	Name
