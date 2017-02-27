@@ -33,11 +33,21 @@ C009	- header
 2.9583  - y coordinate
 string  - Name of variable mapped
 2       - corisponds to the variable id???	Gets copied if coppied is used, if altered, the type will update if the variable updates.  probably legacy.
-Y		(L/R/C/D)	Y	Y	N	N	N	0             - pick (L/R/C/D) for left/right/center/decimal.  ??? for the rest.  Type, center, and coordinate type seems to have no affect.
+{ if defautl Just "Y"
+N	"Arial"	8	TY	0	"BOLD ITALIC UNDERLINE STRIKEOUT "	<- All the special font styles
+N	"Arial"	8	TY	0	""	<- just the selected font
+N	"Arial"	8	TY	128	"" <-128 shows "Maroon" color.  Not going to support this.
+}
+
+		(L/R/C/D)	Y	Y	N	N	N	0             - pick (L/R/C/D) for left/right/center/decimal.  ??? for the rest.  Type, center, and coordinate type seems to have no affect.
 {You can use this to add in a real number as a coordinate instead of a static coordinate.  
 V/F	RealXName	RealYName    - must be real number.  F or V for variable or field
 )The number in the static spot are ignored.  Sub for (null) if unused.
 						Y
+C009	1	7.0104	3.7292	"_YEAR"	4		Y		L	Y	Y	N	N	N	0									Y
+C009	0	0.0000	0.0000	"_YEAR"	22		N	"Helvetica 55 Roman"	8	TY	0	"BOLD "	L	Y	Y	N	N	N	0	V	XPOS1	YPOS						Y
+
+
 Open Group
 C019	Tag
 "EXCLUDE EMPTY ACCT"	Name
