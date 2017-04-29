@@ -21,7 +21,7 @@ public class uMirror
 	public void mirrorToGroup()
 	{
 		string line = "";
-		while(!_mirrorFrom.EndOfStream && !(line = _mirrorFrom.ReadLine()).StartsWith("C019\t\""+_insertTag))
+		while(!_mirrorFrom.EndOfStream && !(line = _mirrorFrom.ReadLine()).StartsWith($"C019\t\"+{_insertTag}"))
 		{
 			_outFile.WriteLine(line);
 		}
@@ -33,7 +33,7 @@ public class uMirror
 	public void mirrorAfterGroup()
 	{
 		string line = "";
-		while (!_mirrorFrom.EndOfStream && !(line = _mirrorFrom.ReadLine()).StartsWith("C020\t\"" + _insertTag))
+		while (!_mirrorFrom.EndOfStream && !(line = _mirrorFrom.ReadLine()).StartsWith($"C020\t\"+{_insertTag}"))
 		{
 			continue;
 		}
@@ -61,14 +61,14 @@ public class uluroGroup
     public void writeOpen( string name)
     {
 
-        outFile.WriteLine("C019" + "\t\"" + name + "\"	N	N	N");
+        outFile.WriteLine($"C019\t\"{name}\"\tN\tN\tN");
 
 	}
 
 	public void writeClose(string name)
 	{
 
-		outFile.WriteLine("C020" + "\t\"" + name + "\"	N	N	N");
+		outFile.WriteLine($"C020\t\"{name}\"\tN\tN\tN");
 
 	}
 }
@@ -99,7 +99,7 @@ public class uluroCond
                 testCode = "\"X\"";
                 break;
             default:
-                testCode = "\"" + test + "\"";
+                testCode = $"\"{test}\"";
                 break;
         }
         return testCode;
@@ -108,13 +108,18 @@ public class uluroCond
     private void writeCondition<T, V>(T param1, string test, V param2, bool isTrue)
     {
         //C012	""	"E"	C2	F	ACCT_ID	X	\d{4,6}-\d{4,6}	N	Y/N	N
-        string outString = "C012	\"\"	" + getCondValue(test);
 
-        outString = outString + "\tC2\t" + (param1.GetType() == System.Type.GetType("String") ? "X\t" + param1:"V\t" + param1.ToString()) 
-            + "\t" 
-            + (param2.GetType() == System.Type.GetType("String") ? "X\t" + param2 : "V\t" + param2.ToString()) 
-            + "\tN\t" + (isTrue ? "N" : "Y") + "\tN";  //Counter intuitive, but this is for the NOT check box.
-        outFile.WriteLine(outString);
+        //Need the magic string for the test
+        string testType = $"C012\t\"\"\t{getCondValue(test)}";
+
+        //Format parameters based on if they are static or variable.
+        string firstParam = $"\tC2\t{(param1.GetType() == System.Type.GetType("String") ? "X\t" + param1 : "V\t" + param1.ToString())}";
+        string secondParam = $"\t{(param2.GetType() == System.Type.GetType("String") ? "X\t" + param2 : "V\t" + param2.ToString())}"; 
+
+        //There is a check box for NOT(thetest).  I forced this 
+        string notBox = $"\tN\t{(isTrue ? "N" : "Y")}\tN";  //Counter intuitive, but this is for the NOT check box.
+
+        outFile.WriteLine($"{testType}{firstParam}{secondParam}{notBox}");
     }
     
     //Maybe an easier way to to do this.
@@ -154,91 +159,38 @@ public class uluroFuncWriter
 		this.outFile = outFile;
 	}
 
-	private void writeFunc(uluroVariable assignTo, string func, uluroVariable[] varParams=null, string[] fixedParams=null)
-	{
-		int varCount, fixCount, paramTot;
-		varCount = (varParams == null ? 0 : varParams.Length);
-		fixCount = (fixedParams == null ? 0 : fixedParams.Length);
-		paramTot = varCount + fixCount;
-		//"C011	\"YPOS\"	\"R\"	\"+\"	C2	X	.3	V	YPOS	N	N"
-		//C011	"resultvar"	"resultType"	"+" C(paramcount)	X/V VAL/PARAMNAME	N	N
+    public void createFunc(uluroVariable assignTo, string func, params object[] input)
+    {
+        var paramTot = input.Length;
+        
+        //"C011	\"YPOS\"	\"R\"	\"+\"	C2	X	.3	V	YPOS	N	N"
+        //C011	"resultvar"	"resultType"	"+" C(paramcount)	X/V VAL/PARAMNAME	N	N
 
-		string outStr = "C011" + "	\"" +
-			assignTo.varName + "\"	\"" + assignTo.varType + "\"	\""
-			+ func + "\"	C" + varCount.ToString() + '\t';
+        string outStr = $"C011\t\"{assignTo.varName}\"\t\"{assignTo.varType}\"\t\"{func}\"\tC{paramTot.ToString()}";
 
-		for(int i = 0; i < varCount; i ++)
-		{
-			outStr = outStr + "V	" + varParams[i].varName + '\t';
-		}
+        for (int i = 0; i < paramTot; i++)
+        {
+            if (input[i].GetType() == typeof(String))
+            {
+                outStr += $"\tX\t{input[i].ToString()}";
+            }
+            else if (input[i].GetType() == typeof(uluroVariable))
+            {
+                outStr +=   $"\tV\t{input[i].ToString()}";
+            }
+        }
 
-		for (int i = 0; i < fixCount; i++)
-		{
-			outStr = outStr + "X	" + fixedParams[i] + '\t';
-		}
-		outFile.WriteLine(outStr + "N	N");
-	}
-
-	public void createFunc(uluroVariable assignTo, string func, params uluroVariable[] varParams)
-	{
-		writeFunc(assignTo, func, varParams,null);
-	}
-
-	public void createFunc(uluroVariable assignTo, string func, params string[] fixParams)
-	{
-		writeFunc(assignTo, func, null, fixParams);
-	}
-
-	public void createFunc(uluroVariable assignTo, string func, uluroVariable[] varParams, string[] fixedParams)
-	{
-		writeFunc(assignTo, func, varParams, fixedParams);
-	}
+        //Add the magic trailing vars.
+        outFile.WriteLine($"{outStr}\tN\tN");
+    }
 }
 
 public abstract class uluroVariable
 {
     public string varType;
-    //{
-    //    get
-    //    {
-    //        return varType;
-    //    }
-    //    set
-    //    { 
-    //        string test = value;
-    //        if (test.Substring(0, 1) != "\"")
-    //        {
-    //            test = '\"' + test;
-    //        }
-    //        if (test.Substring(test.Length - 1) != "\"")
-    //        {
-    //            test = test + '\"';
-    //        }
 
-    //        this.varType = test;
-    //    }
-    //}
     public string varName;
-	//{
-	//    get
-	//    {
-	//        return varName;
-	//    }
-	//    set
-	//    {
-	//        string test = value;
-	//        if (test.Substring(0, 1) != "\"")
-	//        {
-	//            test = '\"' + test;
-	//        }
-	//        if (test.Substring(test.Length - 1) != "\"")
-	//        {
-	//            test = test + '\"';
-	//        }
 
-	//        this.varName = test;
-	//    }
-	//}
 	public string mapFont;
     public StreamWriter outFile { get; set; }
     public override string ToString()
@@ -248,9 +200,7 @@ public abstract class uluroVariable
 
     public  void createFixed(string param)
     {
-        string outStr = "C008" + "	1	\"" + varName + "\"	\"" + varType + "\"	";
-        outStr = outStr + "\"F\"" + '	' + param + '	';
-        outStr = outStr + "\"|\"   C0 N   \"F\"     0       N   0   0   0   0   N   0   Y Y";
+        string outStr = $"C008\t1\t\"{varName}\"\t\"{varType}\"\t\"F\"\t{param}\t\"|\"   C0 N   \"F\"     0       N   0   0   0   0   N   0   Y Y";
         outFile.WriteLine(outStr);
     }
 
@@ -258,7 +208,7 @@ public abstract class uluroVariable
     {
         //Var info: header,some int,"name","type","P" (for position)
         //C008	2	"_TEST VAR"	"M"	"P"
-        string outStr = "C008" + "	1	\"" + varName + "\"	\"" + varType + "\"	\"P\"	";
+        string outStr = $"C008\t{1}\t\"{varName}\"\t\"{varType}\"\t\"P\"\t";
 
         //Input Info:  X, Y, len, delimiter
         //7392	1	30	""	
@@ -266,50 +216,49 @@ public abstract class uluroVariable
         {
             delimiter = "\"" + delimiter + "\"";
         }
-        outStr = outStr + xpos.ToString() + '\t' + ypos.ToString() + '\t' + length.ToString() + '\t'+ delimiter + '\t';
+        outStr += $"{xpos.ToString()}\t{ypos.ToString()}\t{length.ToString()}\t{delimiter}\t";
 
         //Function info: X, Y, len, delimiter
-
         switch (funcName.ToUpper())
         {
 
             case "TRIM":
                 if (param.Length == 0)
                 {
-                    outStr = outStr + "\"T\"\tC0\t" + param;
+                    outStr += $"\"T\"\tC0\t{param}";
                 }
                 else
                 {
-                    outStr = outStr + "\"T\"\tC1\tX\t" + param;
+                    outStr += $"\"T\"\tC1\tX\t{param}";
                 }
                 break;
             case "MULT":
             case "MULTIPLY":
-                outStr = outStr + "\"*\"\tC1\tX\t" + param;
+                outStr += $"\"*\"\tC1\tX\t{param}";
                 break;
             case "DIV":
             case "DIVISION":
-                outStr = outStr + "\"/\"\tC1\tX\t" + param;
+                outStr += $"\"/\"\tC1\tX\t{param}";
                 break;
             case "ADD":
-                outStr = outStr + "\"+\"\tC1\tX\t" + param;
+                outStr += $"\"+\"\tC1\tX\t{param}";
                 break;
             case "MOD":
-                outStr = outStr + "\"!\"\tC1\tX\t" + param;
+                outStr += $"\"!\"\tC1\tX\t{param}";
                 break;
             default:
-                outStr = outStr + "\""+ param+"\"\tC0\t";
+                outStr += $"\"{param}\"\tC0\t";
                 break;
         }
         //Not sure what this is yet.
-        outStr = outStr + "N	\"F\"		0		N	0	0	0	0		1N	0	Y	Y";
+        outStr += "N\t\"F\"\t\t0\t\tN\t0\t0\t0\t0\t\t1N\t0\tY\tY";
         outFile.WriteLine(outStr);
     }
 
 	private string setFont(string alignment = "L", string fontName = "Arial", string fontSize = "10", string fontStyle = "")
 	{
 		//N	"Arial"	8	TY	0	"BOLD ITALIC UNDERLINE STRIKEOUT "	L
-		string fontString = "N" + "	\"" + fontName + "\"	" + fontSize + "	TY	0	\"" + fontStyle + "\"	" + alignment;
+		string fontString = $"N\t\"{fontName}\"\t{fontSize}\tTY\t0\t\"{ fontStyle}\"\t{alignment}";
 
 		return fontString;
 	}
@@ -317,17 +266,17 @@ public abstract class uluroVariable
 	private void genericMapWriter(float xpos, float ypos, string varName, string format, string fontstring, string varString = "			")
 	{
 		//C009	0	3.0520	4.3960	"_TEST CURRENCY"	1		Y		L	Y	Y	N	N	N	0	V	DESCR X	Y POSITION						Y
-		string genericFormula = "C009\t0\t" + xpos.ToString() + "\t" + ypos.ToString() + "\t\"" + varName + "\"";
+		string genericFormula = $"C009\t0\t{xpos.ToString()}\t{ypos.ToString()}\t\"{varName}\"";
 		//This part is static.  1 is tied to the var num of the variable, but doesn't seem to matter.
 		//special formatting goes at the first Y spot.
-		genericFormula = genericFormula + "	1	" + format +'\t'+ fontstring + "	Y	Y	N	N	N	0" + varString + "						Y";
+		genericFormula += $"\t1\t{format}\t{fontstring}\tY\tY\tN\tN\tN\t0{varString}\t\t\t\t\t\tY";
 		outFile.WriteLine(genericFormula);
 	}
 
 	public void createMap(uReal xpos, uReal ypos, string format = "", string alignment = "L", string fontName = "Arial", string fontSize = "10", string fontStyle = "")
 	{
 		string fontStr = setFont(alignment, fontName, fontSize, fontStyle);
-		string varStr = "	V	" + xpos.varName + "	" + ypos.varName;
+		string varStr = $"\tV\t{xpos.varName}\t{ypos.varName}";
 		genericMapWriter(0.0000f, 0.0000f, this.varName, format, fontStr, varStr);
 	}
 
@@ -375,6 +324,7 @@ public class uMapper
 	{
 		mapThis.createMap(xpos, ypos, format, _alignment, _fontName, _fontSize, _fontStyle);
 	}
+
 }
 
 public class uDate : uluroVariable
